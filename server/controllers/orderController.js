@@ -2,7 +2,7 @@ import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import stripe from 'stripe';
 import User from '../models/User.js';
-import Order from "../models/Order.js";
+
 
 //Place order COD   /api/order/cod
 
