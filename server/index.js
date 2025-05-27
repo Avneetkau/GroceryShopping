@@ -17,7 +17,7 @@ import { stripeWebhooks } from './controllers/orderController.js';
 dotenv.config();
 
 const PORT=3000;
-const allowedOrigins=['http://localhost:5173']
+const allowedOrigins=['http://localhost:5173','https://grocery-shopping-three.vercel.app']
 
 
 
