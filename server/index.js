@@ -17,22 +17,26 @@ import { stripeWebhooks } from './controllers/orderController.js';
 dotenv.config();
 
 const PORT=3000;
+const app = express();
 const allowedOrigins=['http://localhost:5173','https://grocery-shopping-three.vercel.app']
 
-
-
-const app = express();
-app.get("/", (req, res) => {
-  res.send("API is running!");
-});
 app.post('/stripe',express.raw({type:'application/json'}), stripeWebhooks)
+
 app.use(cors({ origin : allowedOrigins, credentials : true}));
+
+
+
+
 app.use(express.json());
 app.use(cookieParser());
 
 
-await connectDB();
-await connectCloudinary();
+
+
+app.get("/", (req, res) => {
+  res.send("API is running!");
+});
+
 
 app.use("/api/user", userRouter);
 app.use("/api/seller", sellerRouter);
@@ -40,6 +44,9 @@ app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/order", OrderRouter);
+
+await connectDB();
+await connectCloudinary();
 
 
 app.listen(PORT, () => {
