@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-//axios.defaults.withCredentials = true;
-//axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
-  withCredentials: true, // ✅ ensures cookies like sellerToken are sent
-});
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+//const axiosInstance = axios.create({
+  //baseURL: import.meta.env.VITE_BACKEND_URL,
+  //withCredentials: true, // ✅ ensures cookies like sellerToken are sent
+//});
 
 export const AppContext = createContext();
 
@@ -171,7 +171,7 @@ export const AppContextProvider = ({ children }) => {
     setSearchQuery,
     getCartAmount,
     getCartCount,
-    axios : axiosInstance,  // for better fetch
+    axios,  // for better fetch
     fetchProducts,
     setCartItems
   };
