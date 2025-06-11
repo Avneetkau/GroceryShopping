@@ -1,4 +1,5 @@
-🛒 Grocery Management App (MERN Stack)
+## 🛒 Grocery Management App (MERN Stack)
+
 A full-stack Grocery Management Web Application built with the MERN stack (MongoDB, Express.js, React.js, Node.js). This application helps users manage grocery items efficiently — add, edit, delete, and categorize groceries for personal or household use.
 
 ## 🚀Features
