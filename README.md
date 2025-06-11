@@ -22,7 +22,7 @@ A full-stack Grocery Management Web Application built with the MERN stack (Mongo
 
 ## ⚙️ Getting Started (Run Locally)
 **1. Clone the Repository**
-git clone https://github.com/your-username/grocery-app.git
+git clone https://github.com/Avneetkau/GroceryShopping
 
 cd grocery-app
 
