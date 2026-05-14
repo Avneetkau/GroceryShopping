@@ -19,7 +19,7 @@ dotenv.config();
 const PORT=3000;
 const app = express();
 //const allowedOrigins=['http://localhost:5173','https://grocery-shopping-three.vercel.app', 'https://grocery-shopping-website-sigma.vercel.app']
-const allowedOrigins=['http://localhost:5173']
+const allowedOrigins=['http://localhost:5173' , 'https://grocery-shopping-project.vercel.app/']
 app.post('/stripe',express.raw({type:'application/json'}), stripeWebhooks)
 
 app.use(cors({ origin : allowedOrigins, credentials : true}));
