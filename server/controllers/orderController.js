@@ -101,7 +101,7 @@ export const placeOrderStripe = async ( req, res ) => {
             success_url  : `${origin}/loader?next=my-orders`,
             cancel_url : `${origin}/cart`,
             metadata : {
-                OrderId : order._id.toString(),
+                orderId : order._id.toString(),
                 userId,
             }
         })
