@@ -53,6 +53,9 @@ export const Login = async (req,res) => {
     try{
       const { email, password } = req.body; //taking email and password from body
 
+      console.log(email);
+      console.log(password);
+
       if(!email || !password)
         return res.json({success:false, message : 'Email and password is required'});
 
@@ -79,6 +82,7 @@ export const Login = async (req,res) => {
             })
 
             return res.json({success : true, user : { email : user.email, name : user.name }});
+            console.log(user._id);
       
     }
     catch(error){

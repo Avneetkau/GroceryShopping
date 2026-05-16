@@ -9,7 +9,10 @@ import User from '../models/User.js';
 export const placeOrderCOD = async ( req, res ) => {
        
     try{
-        const  { userId , items , address } = req.body;
+        const userId = req.userId;
+const { items, address } = req.body;
+ // const { userId, items, address } = req.body;
+       
         if(!address || items.length === 0){
             return res.json({ success : false, message : 'Invalid data' });
         }
@@ -45,8 +48,10 @@ export const placeOrderCOD = async ( req, res ) => {
 export const placeOrderStripe = async ( req, res ) => {
        
     try{
-        const  { userId , items , address } = req.body;
+       const userId = req.userId;
+const { items, address } = req.body;
         const { origin } = req.headers;
+        console.log(req.body);
         if(!address || items.length === 0){
             return res.json({ success : false, message : 'Invalid data' });
         }
@@ -105,7 +110,7 @@ export const placeOrderStripe = async ( req, res ) => {
                 userId,
             }
         })
-
+           
         return res.json({ success : true, url : session.url })
 
     } catch(error){

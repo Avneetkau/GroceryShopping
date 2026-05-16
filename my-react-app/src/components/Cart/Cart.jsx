@@ -32,17 +32,23 @@ const Cart = () => {
                 setAddresses(data.addresses);
                 if(data.addresses.length > 0 ){
                     setSelectedAddress(data.addresses[0])
-                } else{
-                    toast.error(data.message);
-                }
+                } 
+                //else{
+                   // toast.error('No address found');
+                //}
              }
         }catch(error){
               toast.error(error.message);
         }
        }
        const placeOrder =  async () => {
+       
 
-        try{
+        try{ 
+
+            if(!user){
+   return toast.error("Please wait, user loading...");
+}
             if(!selectedAddress){
                 return toast.error(" Please select an address ");
             }
@@ -50,7 +56,7 @@ const Cart = () => {
             //Place order with COD
             if(paymentOption == 'COD'){
                 const {data} = await axios.post("/api/order/cod", {
-                    userId : user._id,
+                    //userId : user._id,
                     items : cartArray.map(item => ({ product : item._id, quantity : item.quantity})),
                     address : selectedAddress._id  
                 })
@@ -64,7 +70,7 @@ const Cart = () => {
             }else{
                 //place order with stripe 
                  const {data} = await axios.post("/api/order/stripe", {
-                    userId : user._id,
+                    //userId : user._id,
                     items : cartArray.map(item => ({ product : item._id, quantity : item.quantity})),
                     address : selectedAddress._id  
                 })
@@ -73,6 +79,8 @@ const Cart = () => {
                 } else {
                     toast.error(data.message);
                 }
+                console.log(user);
+console.log(user?._id);
             }
         }catch(error){
                   toast.error(error.message);
@@ -141,7 +149,7 @@ const Cart = () => {
                     <img src={assets.arrow_right_icon_colored} alt="arrow"/>
                         Continue Shopping
                 </button>
-
+                 
             </div>
 
             <div className="max-w-[360px] w-full bg-gray-100/40 p-5 max-md:mt-16 border border-gray-300/70">
