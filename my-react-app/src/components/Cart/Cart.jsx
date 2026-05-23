@@ -41,15 +41,17 @@ const Cart = () => {
               toast.error(error.message);
         }
        }
+
+
+
        const placeOrder =  async () => {
-       
-
-        try{ 
-
+        try
+        { 
             if(!user){
-   return toast.error("Please wait, user loading...");
-}
-            if(!selectedAddress){
+            return toast.error("Please wait, user loading...");
+        }
+            if(!selectedAddress)
+            {
                 return toast.error(" Please select an address ");
             }
 
@@ -68,9 +70,10 @@ const Cart = () => {
                     toast.error(data.message);
                 }
             }else{
+
                 //place order with stripe 
                  const {data} = await axios.post("/api/order/stripe", {
-                    //userId : user._id,
+                    userId : user._id,
                     items : cartArray.map(item => ({ product : item._id, quantity : item.quantity})),
                     address : selectedAddress._id  
                 })
@@ -79,8 +82,8 @@ const Cart = () => {
                 } else {
                     toast.error(data.message);
                 }
-                console.log(user);
-console.log(user?._id);
+                
+
             }
         }catch(error){
                   toast.error(error.message);

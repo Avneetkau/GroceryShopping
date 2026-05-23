@@ -49,9 +49,11 @@ export const placeOrderStripe = async ( req, res ) => {
        
     try{
        const userId = req.userId;
-const { items, address } = req.body;
+       const {  items, address } = req.body;
         const { origin } = req.headers;
         console.log(req.body);
+        console.log(req.userId);
+
         if(!address || items.length === 0){
             return res.json({ success : false, message : 'Invalid data' });
         }
@@ -84,12 +86,13 @@ const { items, address } = req.body;
         });
 
         //stripe gateway initialization
-        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY );
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+
         //create line items for stripe
-        const line_items = productData.map((item)=> {
+        const line_items = productData.map((item)=>{
             return {
                 price_data : {
-                    currency : 'inr',
+                    currency : 'usd',
                     product_data : {
                         name : item.name,
                     },
@@ -119,13 +122,13 @@ const { items, address } = req.body;
 } 
 
 
-//stripe webhooks to verify payment  /api/order/
+//stripe webhooks to verify payment  /stripe
 export const stripeWebhooks =async (request, response) => {
     //stripe payment initialization
      const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY );
 
 
-     const sig = request.headers['stripe-signature'];
+     const sig = request.headers["stripe-signature"];
      let event;
 
      try{
@@ -135,43 +138,80 @@ export const stripeWebhooks =async (request, response) => {
             process.env.STRIPE_WEBHOOK_SECRET
         );
      }catch(error){
-        response.status(404).send(`Webhook Error : ${error.message}`)
+         return response.status(400).send(`Webhook Error : ${error.message}`)
      }
 
      switch (event.type){
-        case "payment_intend.succeeded": {
-            const paymentIntend = event.data.object;
-            const paymentIntendId = paymentIntend.id;
-
+        case "checkout.session.completed": { 
+             // "payment_intent.succeeded"
+            //const paymentIntent = event.data.object;
+            //const paymentIntentId = paymentIntent.id;
             //getting session metadata
+          //  const session = await stripeInstance.checkout.sessions.list({
+            //    payment_intent : paymentIntentId,
+           // });    
 
-            const session = await stripeInstance.checkout.sessions.list({
-                payment_intent : paymentIntendId,
-            });
+    //check if session exists
+    //if (!session.data.length) {
+       // console.log("No session found");
+        //return response.json({ received: true });
+    //}
+               const session = event.data.object; 
+            const { orderId, userId } = session.metadata; //session.data[0].metadata;
+          
+            //await Order.findByIdAndUpdate(orderId, {isPaid:true})
+           // console.log("Payment Success");
 
-            const { orderId, userId } = session.data[0].metadata;
-            //Mark payment as paid
-            await Order.findByIdAndUpdate(orderId, { isPaid : true })
-            //clear user cart
-            await User.findByIdAndUpdate( userId, { cartItems : { }})
+
+            //await User.findByIdAndUpdate(userId, {cartItems : {}})
+            //break;
+             if (!orderId || !userId) {
+                console.log("Missing metadata in session:", session.id);
+                return response.json({ received: true });
+            }
+
+            // Only mark paid if payment was actually collected
+            if (session.payment_status === "paid") {
+                await Order.findByIdAndUpdate(orderId, { isPaid: true });
+                await User.findByIdAndUpdate(userId, { cartItems: {} });
+                console.log("Order marked as paid:", orderId);
+            }
             break;
         }
-         case "payment_intend.failed": {
-            const paymentIntend = event.data.object;
-            const paymentIntendId = paymentIntend.id;
+          case "checkout.session.expired":{
+         //case "payment_intent.payment_failed": {
+           // const paymentIntent = event.data.object;
+            //const paymentIntentId = paymentIntent.id;
 
             //getting session metadata
 
-            const session = await stripeInstance.checkout.sessions.list({
-                payment_intent : paymentIntendId,
-            });
+            //const session = await stripeInstance.checkout.sessions.list({
+              //  payment_intent : paymentIntentId,
+            //});
 
-            const { orderId } = session.data[0].metadata;
-            await Order.findByIdAndDelete(orderId);
+            //const { orderId } = session.data[0].metadata;
+            //await Order.findByIdAndDelete(orderId);
+             let orderId;
+
+            if (event.type === "checkout.session.expired") {
+                orderId = event.data.object.metadata?.orderId;
+            } else {
+                // payment_intent.payment_failed — need to look up session
+                const paymentIntent = event.data.object;
+                const sessions = await stripeInstance.checkout.sessions.list({
+                    payment_intent: paymentIntent.id,
+                });
+                orderId = sessions.data[0]?.metadata?.orderId;
+            }
+
+            if (orderId) {
+                await Order.findByIdAndDelete(orderId);
+                console.log("Order deleted due to failed/expired payment:", orderId);
+            }
             break;
         }
         default :
-        console.error(`Unhandled event type ${event.type}`)
+        console.error(`Unhandled event type ${event.type}`);
         break;
      }
      response.json({received : true});
@@ -196,7 +236,7 @@ export const getUserOrders = async (req, res) => {
 
 //get orders for seller   /api/order/seller
 
-/*export const getSellerOrders = async (req, res) => {
+export const getSellerOrders = async (req, res) => {
     try{
        
         const orders = await Order.find({
@@ -207,7 +247,7 @@ export const getUserOrders = async (req, res) => {
     catch(error){
         return res.json( { success : false , message : error.message })
     }
-}*/
+}
 
 export const getAllOrders = async (req, res) => {
   try {
